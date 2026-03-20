@@ -5,6 +5,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/user.model");
+const blacklistTokenModel = require("../models/blacklist.model");
 
 /**
  * Register a new user
@@ -23,19 +24,31 @@ const registerUser = async (req, res) => {
         if (!username || !email || !password) {
             return res.status(400).json({ message: "All fields are required" });
         }
-        const user = await userModel.findOne({ email });
-        if (user) {
+        const isUserExist = await userModel.findOne({ email });
+        if (isUserExist) {
+            // is user already exist.username == username ; 
             return res.status(400).json({ message: "User already exists" });
         }
-        const hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 12);
         const newUser = await userModel.create({
             username,
             email,
             password: hashedPassword,
         });
-        res.status(201).json({ 
-            message: "User registered successfully", 
-            user: { id: newUser._id, username: newUser.username, email: newUser.email } 
+        const token = jwt.sign(
+            { id: newUser._id, email: newUser.email },
+            process.env.JWT_SECRET,
+            { expiresIn: "1d" }
+        );
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            maxAge: 24 * 60 * 60 * 1000 // 1 day
+        });
+
+        res.status(201).json({
+            message: "User registered successfully",
+            user: { id: newUser._id, username: newUser.username, email: newUser.email }
         });
     } catch (error) {
         console.log(error);
@@ -61,29 +74,32 @@ const loginUser = async (req, res) => {
         }
         const user = await userModel.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(400).json({ message: "Invalid email or password" });
         }
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
+            return res.status(400).json({ message: "Invalid email or password" });
         }
-        
+
         const token = jwt.sign(
-            { id: user._id, email: user.email }, 
-            process.env.JWT_SECRET || "default_secret_key", 
+            { id: user._id, email: user.email },
+            process.env.JWT_SECRET,
             { expiresIn: "1d" }
         );
-        
+
         res.cookie("token", token, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
             maxAge: 24 * 60 * 60 * 1000 // 1 day
         });
 
-        res.status(200).json({ 
-            message: "Login successful", 
-            token, 
-            user: { id: user._id, username: user.username, email: user.email } 
+        res.status(200).json({
+            message: "Login successful",
+            user: {
+                id: user._id,
+                username: user.username,
+                email: user.email
+            }
         });
     } catch (error) {
         console.log(error);
@@ -98,8 +114,12 @@ const loginUser = async (req, res) => {
  * @param {Object} res - Express response object
  * @returns {void} Sends JSON response with success message
  */
-const logoutUser = (req, res) => {
+const logoutUser = async (req, res) => {
     try {
+        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+        if (token) {
+            await blacklistTokenModel.create({ token });
+        }
         res.clearCookie("token");
         res.status(200).json({ message: "Logout successful" });
     } catch (error) {
@@ -122,6 +142,11 @@ const getUserProfile = async (req, res) => {
         const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
         if (!token) {
             return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const isBlacklisted = await blacklistTokenModel.findOne({ token });
+        if (isBlacklisted) {
+            return res.status(401).json({ message: "Unauthorized: Token blacklisted" });
         }
         const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_secret_key");
         const user = await userModel.findById(decoded.id).select("-password");
