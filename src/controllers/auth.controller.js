@@ -1,7 +1,22 @@
+/**
+ * @module controllers/auth
+ * @description Authentication controllers for handling user registration, login, logout, and profile retrieval.
+ */
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/user.model");
 
+/**
+ * Register a new user
+ * @function registerUser
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.username - User's username
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.password - User's password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends JSON response with success message and user details
+ */
 const registerUser = async (req, res) => {
     try {
         const { username, email, password } = req.body;
@@ -28,6 +43,16 @@ const registerUser = async (req, res) => {
     }
 };
 
+/**
+ * Authenticate user and get token
+ * @function loginUser
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.password - User's password
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends JSON response with success message, JWT token, and user details
+ */
 const loginUser = async (req, res) => {
     try {
         const { email, password } = req.body;
@@ -66,6 +91,13 @@ const loginUser = async (req, res) => {
     }
 };
 
+/**
+ * Logout user and clear token cookie
+ * @function logoutUser
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {void} Sends JSON response with success message
+ */
 const logoutUser = (req, res) => {
     try {
         res.clearCookie("token");
@@ -76,6 +108,15 @@ const logoutUser = (req, res) => {
     }
 };
 
+/**
+ * Get current user's profile using JWT token
+ * @function getUserProfile
+ * @param {Object} req - Express request object
+ * @param {Object} req.cookies - Cookies from the request
+ * @param {Object} req.headers - Headers from the request
+ * @param {Object} res - Express response object
+ * @returns {Promise<void>} Sends JSON response with user profile object
+ */
 const getUserProfile = async (req, res) => {
     try {
         const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
