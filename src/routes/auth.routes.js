@@ -1,100 +1,62 @@
+/**
+ * @module routes/auth
+ * @description Authentication routes for handling user registration, login, logout, and profile retrieval.
+ */
 const express = require("express");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-const userModel = require("../models/user.model");
+const { 
+    registerUser, 
+    loginUser, 
+    logoutUser, 
+    getUserProfile 
+} = require("../controllers/auth.controller");
 
 const authRouter = express.Router();
 
-authRouter.post("/register", async (req, res) => {
-    try {
-        const { username, email, password } = req.body;
-        if (!username || !email || !password) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-        const user = await userModel.findOne({ email });
-        if (user) {
-            return res.status(400).json({ message: "User already exists" });
-        }
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = await userModel.create({
-            username,
-            email,
-            password: hashedPassword,
-        });
-        res.status(201).json({ 
-            message: "User registered successfully", 
-            user: { id: newUser._id, username: newUser.username, email: newUser.email } 
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message });
-    }
-});
+/**
+ * @route POST /register
+ * @description Register a new user
+ * @access Public
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.username - User's username
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.password - User's password
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with success message and user details
+ */
+authRouter.post("/register", registerUser);
 
-authRouter.post("/login", async (req, res) => {
-    try {
-        const { email, password } = req.body;
-        if (!email || !password) {
-            return res.status(400).json({ message: "All fields are required" });
-        }
-        const user = await userModel.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-        const isMatch = await bcrypt.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ message: "Invalid credentials" });
-        }
-        
-        const token = jwt.sign(
-            { id: user._id, email: user.email }, 
-            process.env.JWT_SECRET || "default_secret_key", 
-            { expiresIn: "1d" }
-        );
-        
-        res.cookie("token", token, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            maxAge: 24 * 60 * 60 * 1000 // 1 day
-        });
+/**
+ * @route POST /login
+ * @description Authenticate user and get token
+ * @access Public
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body
+ * @param {string} req.body.email - User's email address
+ * @param {string} req.body.password - User's password
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with success message, JWT token, and user details
+ */
+authRouter.post("/login", loginUser);
 
-        res.status(200).json({ 
-            message: "Login successful", 
-            token, 
-            user: { id: user._id, username: user.username, email: user.email } 
-        });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message });
-    }
-});
+/**
+ * @route POST /logout
+ * @description Logout user and clear token cookie
+ * @access Public
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with success message
+ */
+authRouter.post("/logout", logoutUser);
 
-authRouter.post("/logout", (req, res) => {
-    try {
-        res.clearCookie("token");
-        res.status(200).json({ message: "Logout successful" });
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ message: error.message });
-    }
-});
-
-authRouter.get("/profile", async (req, res) => {
-    try {
-        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_secret_key");
-        const user = await userModel.findById(decoded.id).select("-password");
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({ user });
-    } catch (error) {
-        console.log(error);
-        res.status(401).json({ message: "Invalid or expired token" });
-    }
-});
+/**
+ * @route GET /profile
+ * @description Get current user's profile using JWT token
+ * @access Private
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with user profile object
+ */
+authRouter.get("/profile", getUserProfile);
 
 module.exports = authRouter;
