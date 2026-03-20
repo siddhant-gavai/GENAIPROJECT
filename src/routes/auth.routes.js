@@ -9,6 +9,7 @@ const {
     logoutUser, 
     getUserProfile 
 } = require("../controllers/auth.controller");
+const { authUser } = require("../middlewares/auth.middleware");
 
 const authRouter = express.Router();
 
@@ -47,7 +48,7 @@ authRouter.post("/login", loginUser);
  * @param {Object} res - Express response object
  * @returns {Object} JSON response with success message
  */
-authRouter.post("/logout", logoutUser);
+authRouter.post("/logout", authUser, logoutUser);
 
 /**
  * @route GET /profile
@@ -57,6 +58,6 @@ authRouter.post("/logout", logoutUser);
  * @param {Object} res - Express response object
  * @returns {Object} JSON response with user profile object
  */
-authRouter.get("/profile", getUserProfile);
+authRouter.get("/profile", authUser, getUserProfile);
 
 module.exports = authRouter;

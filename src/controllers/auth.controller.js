@@ -116,7 +116,7 @@ const loginUser = async (req, res) => {
  */
 const logoutUser = async (req, res) => {
     try {
-        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+        const token = req.token || req.cookies?.token || req.headers.authorization?.split(" ")[1];
         if (token) {
             await blacklistTokenModel.create({ token });
         }
@@ -139,24 +139,11 @@ const logoutUser = async (req, res) => {
  */
 const getUserProfile = async (req, res) => {
     try {
-        const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
-        if (!token) {
-            return res.status(401).json({ message: "Unauthorized" });
-        }
-
-        const isBlacklisted = await blacklistTokenModel.findOne({ token });
-        if (isBlacklisted) {
-            return res.status(401).json({ message: "Unauthorized: Token blacklisted" });
-        }
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || "default_secret_key");
-        const user = await userModel.findById(decoded.id).select("-password");
-        if (!user) {
-            return res.status(404).json({ message: "User not found" });
-        }
-        res.status(200).json({ user });
+        // req.user is populated by the authUser middleware
+        res.status(200).json({ user: req.user });
     } catch (error) {
         console.log(error);
-        res.status(401).json({ message: "Invalid or expired token" });
+        res.status(500).json({ message: error.message });
     }
 };
 
