@@ -43,7 +43,7 @@ authRouter.post("/login", loginUser);
 /**
  * @route POST /logout
  * @description Logout user and clear token cookie
- * @access Public
+ * @access Private
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @returns {Object} JSON response with success message

@@ -9,7 +9,7 @@ const blacklistTokenModel = require("../models/blacklist.model");
 
 /**
  * Register a new user
- * @function registerUser
+ * @function registerUser\n * @access Public
  * @param {Object} req - Express request object
  * @param {Object} req.body - Request body
  * @param {string} req.body.username - User's username
@@ -58,7 +58,7 @@ const registerUser = async (req, res) => {
 
 /**
  * Authenticate user and get token
- * @function loginUser
+ * @function loginUser\n * @access Public
  * @param {Object} req - Express request object
  * @param {Object} req.body - Request body
  * @param {string} req.body.email - User's email address
@@ -109,14 +109,14 @@ const loginUser = async (req, res) => {
 
 /**
  * Logout user and clear token cookie
- * @function logoutUser
+ * @function logoutUser\n * @access Private
  * @param {Object} req - Express request object
  * @param {Object} res - Express response object
  * @returns {void} Sends JSON response with success message
  */
 const logoutUser = async (req, res) => {
     try {
-        const token = req.token || req.cookies?.token || req.headers.authorization?.split(" ")[1];
+        const token = req.token;
         if (token) {
             await blacklistTokenModel.create({ token });
         }
@@ -130,7 +130,7 @@ const logoutUser = async (req, res) => {
 
 /**
  * Get current user's profile using JWT token
- * @function getUserProfile
+ * @function getUserProfile\n * @access Private
  * @param {Object} req - Express request object
  * @param {Object} req.cookies - Cookies from the request
  * @param {Object} req.headers - Headers from the request
