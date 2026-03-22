@@ -2,7 +2,7 @@
 
 A Node.js backend application with Express and MongoDB, featuring user authentication.
 
-## Features Let's Create!
+## Application Features
 - User Authentication (Register, Login, Logout, Profile)
 - JWT based authentication with secure cookies
 - MongoDB integration with Mongoose
