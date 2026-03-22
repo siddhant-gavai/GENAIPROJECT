@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
+axios.defaults.withCredentials = true;
+
 const Profile = () => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -12,7 +14,7 @@ const Profile = () => {
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/profile');
+        const response = await axios.get('http://localhost:3000/api/auth/profile');
         setUser(response.data.user);
       } catch (err) {
         setError('Session expired or unauthorized. Please login again.');
@@ -27,77 +29,75 @@ const Profile = () => {
   const handleLogout = async () => {
     setLogoutLoading(true);
     try {
-      await axios.post('http://localhost:3000/logout');
+      await axios.post('http://localhost:3000/api/auth/logout');
       navigate('/login');
     } catch (err) {
       console.error('Logout failed:', err);
-      // Force exit anyway on error since cookie is possibly cleared backend 
       navigate('/login');
     }
   };
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center space-y-4">
-        <div className="w-16 h-16 border-4 border-indigo-500/30 border-t-indigo-500 rounded-full animate-spin"></div>
-        <p className="text-indigo-400 font-medium animate-pulse">Loading secure profile...</p>
+      <div className="min-h-screen flex items-center justify-center bg-[#111111] p-4 text-white">
+        <div className="w-8 h-8 border-2 border-[#333] border-t-white rounded-full animate-spin"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="bg-rose-500/10 border border-rose-500/50 text-rose-400 p-6 rounded-2xl shadow-2xl w-full text-center">
-        <p className="font-medium text-lg">{error}</p>
-        <p className="text-sm mt-2 opacity-75">Redirecting to login...</p>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#111111] font-sans text-white p-4">
+        <div className="mb-8 text-center flex flex-col items-center">
+          <div className="flex items-center gap-2 mb-2">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4M3 5h4"/></svg>
+            <h1 className="text-2xl font-bold tracking-tight">Interview-AI</h1>
+          </div>
+        </div>
+        <div className="w-full max-w-[400px] bg-[#171717] border border-[#2a2a2a] p-6 rounded-xl text-center shadow-2xl">
+          <p className="text-red-400 text-sm mb-2">{error}</p>
+          <p className="text-[#a1a1a1] text-xs">Redirecting to login...</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="bg-slate-800/50 backdrop-blur-xl border border-slate-700/50 p-10 rounded-3xl shadow-2xl w-full max-w-lg transform transition-all duration-500 hover:shadow-indigo-500/20">
-      <div className="flex flex-col items-center text-center">
-        <div className="relative group">
-          <div className="absolute -inset-0.5 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full blur opacity-50 group-hover:opacity-100 transition duration-500"></div>
-          <div className="relative w-28 h-28 bg-slate-900 rounded-full flex items-center justify-center border-2 border-slate-700 overflow-hidden">
-            <span className="text-4xl font-extrabold bg-gradient-to-br from-indigo-400 to-purple-400 bg-clip-text text-transparent uppercase">
-              {user?.username?.charAt(0) || 'U'}
-            </span>
-          </div>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#111111] font-sans text-white p-4">
+      
+      {/* Logo & Title */}
+      <div className="mb-8 text-center flex flex-col items-center">
+        <div className="flex items-center gap-2 mb-2">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/><path d="M5 3v4M3 5h4"/></svg>
+          <h1 className="text-2xl font-bold tracking-tight">Interview-AI</h1>
         </div>
+        <p className="text-[#a1a1a1] text-sm">Your Developer Profile</p>
+      </div>
 
-        <h2 className="mt-6 text-3xl font-bold text-white tracking-tight">{user?.username}</h2>
-        <p className="mt-1 text-slate-400 bg-slate-900/50 px-4 py-1.5 rounded-full border border-slate-800 text-sm mt-3 inline-flex items-center gap-2">
-          <svg className="w-4 h-4 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-          </svg>
-          {user?.email}
-        </p>
-
-        <div className="mt-10 w-full space-y-4">
-          <div className="bg-slate-900/50 rounded-2xl p-4 border border-slate-800 flex items-center justify-between">
-            <span className="text-slate-400 text-sm font-medium">Account ID</span>
-            <span className="text-xs font-mono text-slate-500 bg-slate-950 px-2 py-1 rounded-md border border-slate-800">{user?._id}</span>
+      <div className="w-full max-w-[400px] bg-[#171717] border border-[#2a2a2a] rounded-xl p-8 shadow-2xl">
+        <div className="flex flex-col items-center text-center">
+          <div className="w-16 h-16 bg-[#111111] border border-[#333] rounded-full flex items-center justify-center mb-4 text-xl font-bold">
+            {user?.username?.charAt(0) || 'U'}
           </div>
-          
+          <h2 className="text-xl font-semibold text-white tracking-tight">{user?.username}</h2>
+          <p className="text-[#a1a1a1] text-sm mt-1">{user?.email}</p>
+          <div className="mt-4 text-xs text-[#71717a] font-mono">
+            ID: {user?._id}
+          </div>
+
+          <div className="w-full border-t border-[#2a2a2a] my-8"></div>
+
           <button 
             onClick={handleLogout}
             disabled={logoutLoading}
-            className="w-full bg-slate-700 hover:bg-rose-500/20 border border-slate-600 hover:border-rose-500/50 text-slate-300 hover:text-rose-400 font-medium py-3 px-4 rounded-xl transition-all duration-300 flex items-center justify-center gap-2 group"
+            className="w-full bg-[#111111] border border-[#333] hover:bg-[#1f1f1f] text-white font-medium py-2.5 px-4 rounded-lg transition-colors flex justify-center items-center text-sm"
           >
             {logoutLoading ? (
-              <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
+              <svg className="animate-spin h-4 w-4 text-gray-500" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
-            ) : (
-              <>
-                <svg className="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                </svg>
-                Sign Out
-              </>
-            )}
+            ) : "Sign Out"}
           </button>
         </div>
       </div>
