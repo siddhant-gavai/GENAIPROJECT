@@ -21,7 +21,9 @@ const Login = () => {
         password
       });
       if (response.data.token || response.status === 200) {
-        navigate('/profile');
+        const userData = response.data.user || { name: email.split('@')[0], email };
+        localStorage.setItem('user', JSON.stringify(userData));
+        navigate('/');
       }
     } catch (err) {
       setError(err.response?.data?.message || 'Failed to login.');
