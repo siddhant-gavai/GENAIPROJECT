@@ -1,35 +1,20 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-axios.defaults.withCredentials = true;
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useLogin } from '../hooks/useAuth';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const { login, loading, error, setError } = useLogin('/');
+
+  // Clear error on component mount or unmount if needed
+  useEffect(() => {
+    return () => setError('');
+  }, [setError]);
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setError('');
-    setLoading(true);
-    try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
-        email,
-        password
-      });
-      if (response.data.token || response.status === 200) {
-        const userData = response.data.user || { name: email.split('@')[0], email };
-        localStorage.setItem('user', JSON.stringify(userData));
-        navigate('/');
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to login.');
-    } finally {
-      setLoading(false);
-    }
+    await login(email, password);
   };
 
   return (
@@ -62,7 +47,7 @@ const Login = () => {
               required 
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full bg-[#2a2a2a] border border-gray-600 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              className="w-full bg-[#2a2a2a] border border-gray-600 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all font-mono"
               placeholder="you@example.com"
             />
           </div>
@@ -74,7 +59,7 @@ const Login = () => {
               required 
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-[#2a2a2a] border border-gray-600 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all"
+              className="w-full bg-[#2a2a2a] border border-gray-600 rounded-lg px-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white/20 transition-all font-mono"
               placeholder="••••••••"
             />
           </div>
@@ -82,7 +67,7 @@ const Login = () => {
           <button 
             type="submit" 
             disabled={loading}
-            className="w-full bg-white text-black hover:scale-[1.02] hover:brightness-110 shadow-lg transition-transform font-medium py-2.5 px-4 rounded-lg mt-6 flex items-center justify-center text-sm"
+            className="w-full bg-white text-black hover:scale-[1.02] hover:brightness-110 shadow-lg transition-transform font-medium py-2.5 px-4 rounded-lg mt-6 flex items-center justify-center text-sm group"
           >
             {loading ? (
               <svg className="animate-spin h-5 w-5 text-gray-600" viewBox="0 0 24 24">

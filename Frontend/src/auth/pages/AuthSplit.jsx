@@ -1,67 +1,27 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-axios.defaults.withCredentials = true;
+import { useLogin, useRegister } from '../hooks/useAuth';
 
 const AuthSplit = () => {
-  const navigate = useNavigate();
-
   // Login State
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
-  const [loginError, setLoginError] = useState('');
-  const [loginLoading, setLoginLoading] = useState(false);
+  const { login, loading: loginLoading, error: loginError } = useLogin('/profile');
 
   // Register State
   const [regUsername, setRegUsername] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
   const [regConfirmPassword, setRegConfirmPassword] = useState('');
-  const [regError, setRegError] = useState('');
-  const [regLoading, setRegLoading] = useState(false);
+  const { register, loading: regLoading, error: regError } = useRegister('/profile');
 
   const handleLogin = async (e) => {
     e.preventDefault();
-    setLoginError('');
-    setLoginLoading(true);
-    try {
-      const response = await axios.post('http://localhost:3000/api/auth/login', {
-        email: loginEmail,
-        password: loginPassword
-      });
-      if (response.data.token || response.status === 200) {
-        navigate('/profile');
-      }
-    } catch (err) {
-      setLoginError(err.response?.data?.message || 'Failed to login.');
-    } finally {
-      setLoginLoading(false);
-    }
+    await login(loginEmail, loginPassword);
   };
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setRegError('');
-    if (regPassword !== regConfirmPassword) {
-      setRegError("Passwords do not match");
-      return;
-    }
-    setRegLoading(true);
-    try {
-      const response = await axios.post('http://localhost:3000/api/auth/register', {
-        username: regUsername,
-        email: regEmail,
-        password: regPassword
-      });
-      if (response.data.token || response.status === 201) {
-        navigate('/profile');
-      }
-    } catch (err) {
-      setRegError(err.response?.data?.message || 'Failed to register.');
-    } finally {
-      setRegLoading(false);
-    }
+    await register(regUsername, regEmail, regPassword, regConfirmPassword);
   };
 
   return (

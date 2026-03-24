@@ -1,42 +1,21 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-
-axios.defaults.withCredentials = true;
+import { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useRegister } from '../hooks/useAuth';
 
 const Register = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const { register, loading, error, setError } = useRegister('/');
+
+  useEffect(() => {
+    return () => setError('');
+  }, [setError]);
 
   const handleRegister = async (e) => {
     e.preventDefault();
-    setError('');
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
-      return;
-    }
-    setLoading(true);
-    try {
-      const response = await axios.post('http://localhost:3000/api/auth/register', {
-        username,
-        email,
-        password
-      });
-      if (response.data.token || response.status === 201) {
-        const userData = response.data.user || { name: username || email.split('@')[0], email };
-        localStorage.setItem('user', JSON.stringify(userData));
-        navigate('/');
-      }
-    } catch (err) {
-      setError(err.response?.data?.message || 'Failed to register.');
-    } finally {
-      setLoading(false);
-    }
+    await register(username, email, password, confirmPassword);
   };
 
   return (
