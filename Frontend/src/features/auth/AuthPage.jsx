@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { useLogin, useRegister } from '../hooks/useAuth';
+import { useLogin, useRegister } from './useAuth';
 
-const AuthSplit = () => {
+const AuthPage = () => {
   // Login State
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -184,4 +184,4 @@ const AuthSplit = () => {
   );
 };
 
-export default AuthSplit;
+export default AuthPage;

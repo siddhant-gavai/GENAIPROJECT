@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useLogin } from '../hooks/useAuth';
+import { useLogin } from './useAuth';
 
 const Login = () => {
   const [email, setEmail] = useState('');

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { authService } from '../services/auth.service';
+import { authService } from './authService';
 
 export const useLogin = (onSuccessRedirect = '/') => {
   const [loading, setLoading] = useState(false);
