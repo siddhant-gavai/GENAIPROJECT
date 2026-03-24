@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useRegister } from './useAuth';
+import { useRegister } from '../hooks/useAuth';
 
-const Register = () => {
+const RegisterForm = () => {
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -118,4 +118,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default RegisterForm;

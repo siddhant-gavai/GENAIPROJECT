@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useLogin } from './useAuth';
+import { useLogin } from '../hooks/useAuth';
 
-const Login = () => {
+const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, loading, error, setError } = useLogin('/');
@@ -91,4 +91,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginForm;
