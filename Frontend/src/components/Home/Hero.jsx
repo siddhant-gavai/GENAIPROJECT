@@ -19,7 +19,7 @@ const Hero = () => {
         
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up animation-delay-300">
           <Link
-            to="/register"
+            to="/auth"
             className="w-full sm:w-auto px-8 py-3.5 rounded-xl bg-white text-[#212121] font-semibold hover:bg-gray-100 transition-all duration-200 hover:scale-[1.02] shadow-lg shadow-white/5 text-center"
           >
             Get Started

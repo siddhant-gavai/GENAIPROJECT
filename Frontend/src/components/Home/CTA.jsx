@@ -16,7 +16,7 @@ const CTA = () => {
         </p>
         
         <Link
-          to="/register"
+          to="/auth"
           className="inline-block px-10 py-4 rounded-xl bg-white text-[#212121] font-semibold text-lg hover:bg-gray-100 transition-all duration-200 hover:scale-[1.02] shadow-[0_0_40px_-10px_rgba(255,255,255,0.3)]"
         >
           Get Started

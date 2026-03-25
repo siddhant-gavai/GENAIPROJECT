@@ -16,7 +16,7 @@ const Navbar = () => {
 
   const handleLogout = () => {
     localStorage.removeItem('user');
-    navigate('/login');
+    navigate('/auth');
   };
 
   // Close dropdown if clicked outside
@@ -84,7 +84,7 @@ const Navbar = () => {
             </div>
           ) : (
             <Link
-              to="/login"
+              to="/auth"
               className="text-sm font-medium text-white bg-white/10 hover:bg-white/20 transition-colors duration-200 px-4 py-2 rounded-lg"
             >
               Login

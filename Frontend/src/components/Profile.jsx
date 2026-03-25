@@ -18,7 +18,7 @@ const Profile = () => {
         setUser(response.data.user);
       } catch (err) {
         setError('Session expired or unauthorized. Please login again.');
-        setTimeout(() => navigate('/login'), 2000);
+        setTimeout(() => navigate('/auth'), 2000);
       } finally {
         setLoading(false);
       }
@@ -30,10 +30,10 @@ const Profile = () => {
     setLogoutLoading(true);
     try {
       await axios.post('http://localhost:3000/api/auth/logout');
-      navigate('/login');
+      navigate('/auth');
     } catch (err) {
       console.error('Logout failed:', err);
-      navigate('/login');
+      navigate('/auth');
     }
   };
 
