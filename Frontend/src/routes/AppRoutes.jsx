@@ -1,7 +1,6 @@
 import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import LoginForm from '../features/auth/components/LoginForm';
-import RegisterForm from '../features/auth/components/RegisterForm';
-import AuthPage from '../features/auth/pages/AuthPage';
+import Login from '../features/auth/pages/Login';
+import Register from '../features/auth/pages/Register';
 import InterviewPage from '../features/ai/pages/InterviewPage';
 import Profile from '../components/Profile';
 import Home from '../pages/Home';
@@ -28,9 +27,8 @@ const AppRoutes = () => {
               <Route path="/interview" element={<InterviewPage />} />
             </Route>
             <Route element={<PublicRoute />}>
-              <Route path="/auth" element={<AuthPage />} />
-              <Route path="/login" element={<LoginForm />} />
-              <Route path="/register" element={<RegisterForm />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
             </Route>
           </Routes>
         </main>

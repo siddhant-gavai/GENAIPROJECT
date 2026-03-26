@@ -18,9 +18,8 @@ const LoginForm = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#212121] text-white p-4 font-sans relative overflow-hidden">
-      <div className="w-full max-w-md bg-[#2a2a2a] border border-gray-600/50 rounded-2xl p-8 shadow-2xl transition-all duration-300 relative z-10">
-        
+    <div className="w-full max-w-md bg-[#2a2a2a] border border-gray-600/50 rounded-2xl p-8 shadow-2xl transition-all duration-300 relative z-10">
+
         {/* Branding & Title */}
         <div className="flex flex-col items-center justify-center mb-8">
           <div className="flex items-center gap-2 mb-4">
@@ -81,13 +80,12 @@ const LoginForm = () => {
         <div className="mt-6 text-center">
           <p className="text-gray-400 text-sm">
             Don't have an account?{' '}
-            <Link to="/auth" className="text-white hover:underline transition-colors font-medium">
+            <Link to="/register" className="text-white hover:underline transition-colors font-medium">
               Sign up
             </Link>
           </p>
         </div>
       </div>
-    </div>
   );
 };
 
