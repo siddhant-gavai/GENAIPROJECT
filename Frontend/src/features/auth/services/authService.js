@@ -1,5 +1,6 @@
 import axios from 'axios';
 
+// Handles authentication API requests
 const API_URL = 'http://localhost:3000/api/auth';
 
 axios.defaults.withCredentials = true;
